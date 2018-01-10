@@ -1,13 +1,11 @@
 package cosmo
 
 import (
-	"reflect"
 	"testing"
 )
 
 func benchmarkFlatLCDMEN(n int, b *testing.B) {
 	cos := FlatLCDM{H0: 70, Om0: 0.27}
-
 	var z float64
 	zMax := 1.0
 	step := zMax / float64(n)
@@ -24,7 +22,8 @@ func BenchmarkFlatLCDMEN(b *testing.B) {
 }
 
 func BenchmarkFlatLCDMENdistance(b *testing.B) {
-	benchmarkFlatLCDMNdistance(10000, "E", b)
+	cos := FlatLCDM{H0: 70, Om0: 0.27}
+	benchmarkFlatLCDMNdistance(10000, cos.E, b)
 }
 
 func BenchmarkFlatLCDME(b *testing.B) {
@@ -44,55 +43,57 @@ func BenchmarkFlatLCDMEinv(b *testing.B) {
 }
 
 // benchmarkFlatLCDMDistance is a helper function to be called by specific benchmarkFlatLCDMs
-func benchmarkFlatLCDMDistance(distFunc string, b *testing.B) {
-	cos := FlatLCDM{H0: 70, Om0: 0.27}
+func benchmarkFlatLCDMDistance(f func(float64) float64, b *testing.B) {
 	z := 1.0
-
-	funcToTest := reflect.ValueOf(&cos).MethodByName(distFunc)
 	for i := 0; i < b.N; i++ {
-		funcToTest.Call([]reflect.Value{reflect.ValueOf(z)})
+		f(z)
 	}
 }
 
 // benchmarkFlatLCDMNdistance is a helper function to be called by specific benchmarkFlatLCDMs
-func benchmarkFlatLCDMNdistance(n int, distFunc string, b *testing.B) {
-	cos := FlatLCDM{H0: 70, Om0: 0.27}
-	funcToTest := reflect.ValueOf(&cos).MethodByName(distFunc)
+func benchmarkFlatLCDMNdistance(n int, f func(float64) float64, b *testing.B) {
 	var z float64
 	zMax := 1.0
 	step := zMax / float64(n)
 	for i := 0; i < b.N; i++ {
 		for j := 0; j < n; j++ {
 			z = 0.001 + step*float64(j)
-			funcToTest.Call([]reflect.Value{reflect.ValueOf(z)})
+			f(z)
 		}
 	}
 }
 
 func BenchmarkFlatLCDMComovingDistance(b *testing.B) {
-	benchmarkFlatLCDMDistance("ComovingDistance", b)
+	cos := FlatLCDM{H0: 70, Om0: 0.27}
+	benchmarkFlatLCDMDistance(cos.ComovingDistance, b)
 }
 
 func BenchmarkFlatLCDMComovingTransverseDistance(b *testing.B) {
-	benchmarkFlatLCDMDistance("ComovingTransverseDistance", b)
+	cos := FlatLCDM{H0: 70, Om0: 0.27}
+	benchmarkFlatLCDMDistance(cos.ComovingTransverseDistance, b)
 }
 
 func BenchmarkFlatLCDMLuminosityDistance(b *testing.B) {
-	benchmarkFlatLCDMDistance("LuminosityDistance", b)
+	cos := FlatLCDM{H0: 70, Om0: 0.27}
+	benchmarkFlatLCDMDistance(cos.LuminosityDistance, b)
 }
 
 func BenchmarkFlatLCDMLookbackTime(b *testing.B) {
-	benchmarkFlatLCDMDistance("LookbackTime", b)
+	cos := FlatLCDM{H0: 70, Om0: 0.27}
+	benchmarkFlatLCDMDistance(cos.LookbackTime, b)
 }
 
 func BenchmarkFlatLCDMNComovingDistance(b *testing.B) {
-	benchmarkFlatLCDMNdistance(10000, "ComovingDistance", b)
+	cos := FlatLCDM{H0: 70, Om0: 0.27}
+	benchmarkFlatLCDMNdistance(10000, cos.ComovingDistance, b)
 }
 
 func BenchmarkFlatLCDMNLuminosityDistance(b *testing.B) {
-	benchmarkFlatLCDMNdistance(10000, "LuminosityDistance", b)
+	cos := FlatLCDM{H0: 70, Om0: 0.27}
+	benchmarkFlatLCDMNdistance(10000, cos.LuminosityDistance, b)
 }
 
 func BenchmarkFlatLCDMNE(b *testing.B) {
-	benchmarkFlatLCDMNdistance(10000, "E", b)
+	cos := FlatLCDM{H0: 70, Om0: 0.27}
+	benchmarkFlatLCDMNdistance(10000, cos.E, b)
 }
