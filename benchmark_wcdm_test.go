@@ -1,7 +1,6 @@
 package cosmo
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -24,7 +23,8 @@ func BenchmarkWCDMEN(b *testing.B) {
 }
 
 func BenchmarkWCDMENdistance(b *testing.B) {
-	benchmarkWCDMNdistance(10000, "E", b)
+	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+	benchmarkWCDMNdistance(10000, cos.E, b)
 }
 
 func BenchmarkWCDME(b *testing.B) {
@@ -43,108 +43,78 @@ func BenchmarkWCDMEinv(b *testing.B) {
 	}
 }
 
-// benchmarkWCDMDistanceFlat is a helper function to be called by specific benchmarkWCDMs
-//   for an Omega_K == 0 cosmology
-func benchmarkWCDMDistanceFlat(distFunc string, b *testing.B) {
-	cos := WCDM{H0: 70, Om0: 0.3, Ol0: 0.7, W0: -1}
-	z := 1.0
-
-	funcToTest := reflect.ValueOf(&cos).MethodByName(distFunc)
-	for i := 0; i < b.N; i++ {
-		funcToTest.Call([]reflect.Value{reflect.ValueOf(z)})
-	}
-}
-
-// benchmarkWCDMDistancePositiveOk0 is a helper function to be called by specific benchmarkWCDMs
-//   for an Omega_K > 0 cosmology
-func benchmarkWCDMDistancePositiveOk0(distFunc string, b *testing.B) {
-	cos := WCDM{H0: 70, Om0: 0.3, Ol0: 0.9, W0: -1}
-	z := 1.0
-
-	funcToTest := reflect.ValueOf(&cos).MethodByName(distFunc)
-	for i := 0; i < b.N; i++ {
-		funcToTest.Call([]reflect.Value{reflect.ValueOf(z)})
-	}
-}
-
-// benchmarkWCDMDistanceOM is a helper function to be called by specific benchmarkWCDMs
-//   for an Omega_Lambda = 0 cosmology
-func benchmarkWCDMDistanceOM(distFunc string, b *testing.B) {
-	cos := WCDM{H0: 70, Om0: 0.3, Ol0: 0, W0: -1.2}
-	z := 1.0
-
-	funcToTest := reflect.ValueOf(&cos).MethodByName(distFunc)
-	for i := 0; i < b.N; i++ {
-		funcToTest.Call([]reflect.Value{reflect.ValueOf(z)})
-	}
-}
-
 // benchmarkWCDMDistance is a helper function to be called by specific benchmarkWCDMs
-func benchmarkWCDMDistance(distFunc string, b *testing.B) {
-	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+func benchmarkWCDMDistance(f func(float64) float64, b *testing.B) {
 	z := 1.0
-
-	funcToTest := reflect.ValueOf(&cos).MethodByName(distFunc)
 	for i := 0; i < b.N; i++ {
-		funcToTest.Call([]reflect.Value{reflect.ValueOf(z)})
+		f(z)
 	}
 }
 
 // benchmarkWCDMNdistance is a helper function to be called by specific benchmarkWCDMs
-func benchmarkWCDMNdistance(n int, distFunc string, b *testing.B) {
-	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
-	funcToTest := reflect.ValueOf(&cos).MethodByName(distFunc)
+func benchmarkWCDMNdistance(n int, f func(float64) float64, b *testing.B) {
 	var z float64
 	zMax := 1.0
 	step := zMax / float64(n)
 	for i := 0; i < b.N; i++ {
 		for j := 0; j < n; j++ {
 			z = 0.001 + step*float64(j)
-			funcToTest.Call([]reflect.Value{reflect.ValueOf(z)})
+			f(z)
 		}
 	}
 }
 
 func BenchmarkWCDMComovingDistance(b *testing.B) {
-	benchmarkWCDMDistance("ComovingDistance", b)
+	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+	benchmarkWCDMDistance(cos.ComovingDistance, b)
 }
 
 func BenchmarkWCDMComovingTransverseDistance(b *testing.B) {
-	benchmarkWCDMDistance("ComovingTransverseDistance", b)
+	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+	benchmarkWCDMDistance(cos.ComovingTransverseDistance, b)
 }
 
 func BenchmarkWCDMLuminosityDistance(b *testing.B) {
-	benchmarkWCDMDistance("LuminosityDistance", b)
+	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+	benchmarkWCDMDistance(cos.LuminosityDistance, b)
 }
 
 func BenchmarkWCDMLookbackTime(b *testing.B) {
-	benchmarkWCDMDistance("LookbackTime", b)
+	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+	benchmarkWCDMDistance(cos.LookbackTime, b)
 }
 
 func BenchmarkWCDMNComovingDistance(b *testing.B) {
-	benchmarkWCDMNdistance(10000, "ComovingDistance", b)
+	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+	benchmarkWCDMNdistance(10000, cos.ComovingDistance, b)
 }
 
 func BenchmarkWCDMNLuminosityDistance(b *testing.B) {
-	benchmarkWCDMNdistance(10000, "LuminosityDistance", b)
+	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+	benchmarkWCDMNdistance(10000, cos.LuminosityDistance, b)
 }
 
 func BenchmarkWCDMNE(b *testing.B) {
-	benchmarkWCDMNdistance(10000, "E", b)
+	cos := WCDM{H0: 70, Om0: 0.2, Ol0: 0.7, W0: -1.2}
+	benchmarkWCDMNdistance(10000, cos.E, b)
 }
 
 func BenchmarkWCDMComovingDistanceOM(b *testing.B) {
-	benchmarkWCDMDistanceOM("ComovingDistance", b)
+	cos := WCDM{H0: 70, Om0: 0.3, Ol0: 0, W0: -1.2}
+	benchmarkWCDMDistance(cos.ComovingDistance, b)
 }
 
 func BenchmarkWCDMLookbackTimeOM(b *testing.B) {
-	benchmarkWCDMDistanceOM("LookbackTime", b)
+	cos := WCDM{H0: 70, Om0: 0.3, Ol0: 0, W0: -1.2}
+	benchmarkWCDMDistance(cos.LookbackTime, b)
 }
 
 func BenchmarkWCDMComovingDistanceFlat(b *testing.B) {
-	benchmarkWCDMDistanceFlat("ComovingDistance", b)
+	cos := WCDM{H0: 70, Om0: 0.3, Ol0: 0.7, W0: -1}
+	benchmarkWCDMDistance(cos.ComovingDistance, b)
 }
 
 func BenchmarkWCDMComovingDistancePositiveOk0(b *testing.B) {
-	benchmarkWCDMDistancePositiveOk0("ComovingDistance", b)
+	cos := WCDM{H0: 70, Om0: 0.3, Ol0: 0.9, W0: -1}
+	benchmarkWCDMDistance(cos.ComovingDistance, b)
 }
