@@ -2,8 +2,9 @@ package cosmo
 
 import (
 	"fmt"
-	"gonum.org/v1/gonum/integrate/quad"
 	"math"
+
+	"gonum.org/v1/gonum/integrate/quad"
 )
 
 // WCDM provides cosmological distances, age, and look-back time

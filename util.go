@@ -1,9 +1,10 @@
 package cosmo
 
 import (
-	"gonum.org/v1/gonum/mathext"
 	"math"
 	"math/cmplx"
+
+	"gonum.org/v1/gonum/mathext"
 )
 
 // lookbackTimeOL is lookback time for dark-energy + curvature only Universe

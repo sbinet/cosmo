@@ -2,10 +2,11 @@ package cosmo
 
 import (
 	"fmt"
-	"gonum.org/v1/gonum/floats"
 	"reflect"
 	"runtime"
 	"testing"
+
+	"gonum.org/v1/gonum/floats"
 )
 
 const distmodTol = 1e-8 // mag
